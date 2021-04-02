@@ -1,9 +1,9 @@
 import gym
-
-env = gym.make("CartPole-v1")
+env = gym.make("Assault-ram-v0")
 
 observation = env.reset()
 
+print(f"Observation: {observation.size}")
 print(f"Observation: {observation}")
 print(f"Action space: {env.action_space}")
 print("---")

@@ -5,7 +5,7 @@ import numpy as np
 
 import neat
 
-# import visualize
+import visualize
 import gym
 
 
@@ -20,8 +20,8 @@ def eval_genome(genome, config):
     fitnesses = []
 
     for runs in range(runs_per_net):
-        env = gym.make("CartPole-v1")
-
+        #env = gym.make("CartPole-v1")
+        env = gym.make("Assault-ram-v0")
         observation = env.reset()
         # Run the given simulation for up to num_steps time steps.
         fitness = 0.0
@@ -67,20 +67,15 @@ def run():
 
     print(f"Winner: {winner}")
 
-    # visualize.plot_stats(stats, ylog=True, view=True,
-    #                      filename="feedforward-fitness.svg")
-    # visualize.plot_species(
-    #     stats, view=True, filename="feedforward-speciation.svg")
+    visualize.plot_stats(stats, ylog=True, view=True, filename="vis/feedforward-fitness.svg")
+    visualize.plot_species(stats, view=True, filename="vis/feedforward-speciation.svg")
 
-    # node_names = {-1: 'x', -2: 'dx', -3: 'theta', -4: 'dtheta', 0: 'control'}
-    # visualize.draw_net(config, winner, True, node_names=node_names)
+    node_names = {-1: 'x', -2: 'dx', -3: 'theta', -4: 'dtheta', 0: 'control'}
+    visualize.draw_net(config, winner, True, node_names=node_names)
 
-    # visualize.draw_net(config, winner, view=True, node_names=node_names,
-    #                    filename="winner-feedforward.gv")
-    # visualize.draw_net(config, winner, view=True, node_names=node_names,
-    #                    filename="winner-feedforward-enabled.gv", show_disabled=False)
-    # visualize.draw_net(config, winner, view=True, node_names=node_names,
-    #                    filename="winner-feedforward-enabled-pruned.gv", show_disabled=False, prune_unused=True)
+    visualize.draw_net(config, winner, view=True, node_names=node_names,                     filename="vis/winner-feedforward.gv")
+    visualize.draw_net(config, winner, view=True, node_names=node_names,                     filename="vis/winner-feedforward-enabled.gv", show_disabled=False)
+    visualize.draw_net(config, winner, view=True, node_names=node_names,                     filename="vis/winner-feedforward-enabled-pruned.gv", show_disabled=False, prune_unused=True)
 
 
 if __name__ == '__main__':
