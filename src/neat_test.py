@@ -4,28 +4,45 @@ import neat
 import gym
 import numpy as np
 
-# load the winner
-with open("winner", "rb") as f:
-    c = pickle.load(f)
+
+def load_winner():
+    with open("winner", "rb") as f:
+        c = pickle.load(f)
+
+    return c
 
 
-print("Loaded genome:")
-print(c)
+def run():
 
-local_dir = os.path.dirname(__file__)
-config_path = os.path.join(local_dir, 'config')
-config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                     neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                     config_path)
+    c = load_winner()
 
-net = neat.nn.FeedForwardNetwork.create(c, config)
+    print("Loaded genome:")
+    print(c)
 
-env = gym.make("Assault-ram-v0")
-observation = env.reset()
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'config')
+    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_path)
 
-done = False
-while not done:
-    action = np.argmax(net.activate(observation))
+    net = neat.nn.FeedForwardNetwork.create(c, config)
 
-    observation, reward, done, info = env.step(action)
-    env.render()
+    env = gym.make("Assault-ram-v0")
+    observation = env.reset()
+    fitness = 0
+
+    done = False
+    while not done:
+        action = np.argmax(net.activate(observation))
+
+        observation, reward, done, _ = env.step(action)
+        fitness += reward
+        env.render()
+
+    env.close()
+
+    print(f"SCORE: {fitness}")
+
+
+if __name__ == '__main__':
+    run()

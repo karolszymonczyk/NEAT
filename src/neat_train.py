@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import sys
 import pickle
 import numpy as np
 
@@ -9,38 +10,40 @@ import visualize
 import gym
 
 
-runs_per_net = 2
-# simulation_seconds = 60.0
-
-
-# Use the NN network phenotype and the discrete actuator force function.
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
     fitnesses = []
 
-    for runs in range(runs_per_net):
-        #env = gym.make("CartPole-v1")
+    for _ in range(runs_per_net):
         env = gym.make("Assault-ram-v0")
         observation = env.reset()
-        # Run the given simulation for up to num_steps time steps.
+
         fitness = 0.0
         done = False
         while not done:
 
-            action = np.argmax(net.activate(observation))  # predict
-            observation, reward, done, info = env.step(action)
+            # predict action
+            action = np.argmax(net.activate(observation))
+            observation, reward, done, _ = env.step(action)
+
+            if(live):
+                env.render()
 
             fitness += reward
 
+        env.close()
+
         fitnesses.append(fitness)
 
-    # The genome's fitness is its worst performance across all runs.
-    return np.mean(fitnesses)
+    net_fitness = np.mean(fitnesses)
+
+    # The genome's fitness is its mean performance across all runs.
+    return net_fitness
 
 
 def eval_genomes(genomes, config):
-    for genome_id, genome in genomes:
+    for _, genome in genomes:
         genome.fitness = eval_genome(genome, config)
 
 
@@ -61,22 +64,38 @@ def run():
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
     winner = pop.run(pe.evaluate)
 
-    # Save the winner.
-    with open('winner', 'wb') as f:
+    save_model(winner, 'winner')
+
+    # print_stats(winner, stats, config)
+
+
+def save_model(winner, filepath):
+    with open(filepath, 'wb') as f:
         pickle.dump(winner, f)
 
+
+def print_stats(winner, stats, config):
     print(f"Winner: {winner}")
 
-    visualize.plot_stats(stats, ylog=True, view=True, filename="vis/feedforward-fitness.svg")
-    visualize.plot_species(stats, view=True, filename="vis/feedforward-speciation.svg")
+    visualize.plot_stats(stats, ylog=True,   view=True,
+                         filename="vis/feedforward-fitness.svg")
+    visualize.plot_species(
+        stats, view=True, filename="vis/feedforward-speciation.svg")
 
     node_names = {-1: 'x', -2: 'dx', -3: 'theta', -4: 'dtheta', 0: 'control'}
     visualize.draw_net(config, winner, True, node_names=node_names)
 
-    visualize.draw_net(config, winner, view=True, node_names=node_names,                     filename="vis/winner-feedforward.gv")
-    visualize.draw_net(config, winner, view=True, node_names=node_names,                     filename="vis/winner-feedforward-enabled.gv", show_disabled=False)
-    visualize.draw_net(config, winner, view=True, node_names=node_names,                     filename="vis/winner-feedforward-enabled-pruned.gv", show_disabled=False, prune_unused=True)
+    visualize.draw_net(config, winner, view=True, node_names=node_names,
+                       filename="vis/winner-feedforward.gv")
+    visualize.draw_net(config, winner, view=True, node_names=node_names,
+                       filename="vis/winner-feedforward-enabled.gv", show_disabled=False)
+    visualize.draw_net(config, winner, view=True, node_names=node_names,
+                       filename="vis/winner-feedforward-enabled-pruned.gv", show_disabled=False, prune_unused=True)
 
 
 if __name__ == '__main__':
+    live = '-live' in sys.argv
+    save = '-save' in sys.argv
+    runs_per_net = 2
+
     run()
