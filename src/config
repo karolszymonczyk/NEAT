@@ -3,15 +3,15 @@
 # The `NEAT` section specifies parameters particular to the NEAT algorithm
 # or the experiment itself.  This is the only required section.
 [NEAT]
-fitness_criterion = mean
+fitness_criterion = max
 fitness_threshold = 1000.0
 no_fitness_termination = 0
-pop_size = 15
+pop_size = 30
 reset_on_extinction = 0
 
 [DefaultGenome]
 num_inputs = 128
-num_hidden = 2
+num_hidden = 7
 num_outputs = 7
 initial_connection = partial_direct 0.5
 feed_forward = True
@@ -23,10 +23,10 @@ node_add_prob = 0.2
 node_delete_prob = 0.2
 activation_default = clamped
 activation_options = clamped
-activation_mutate_rate = 0.0
+activation_mutate_rate = 0.1
 aggregation_default = sum
 aggregation_options = sum
-aggregation_mutate_rate = 0.0
+aggregation_mutate_rate = 0.1
 bias_init_mean = 0.0
 bias_init_stdev = 1.0
 bias_replace_rate = 0.1
@@ -57,7 +57,7 @@ compatibility_threshold = 3.0
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation = 20
+max_stagnation = 10
 
 [DefaultReproduction]
 elitism = 2

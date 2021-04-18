@@ -1,12 +1,13 @@
 import os
+import sys
 import pickle
 import neat
 import gym
 import numpy as np
 
 
-def load_winner():
-    with open("winner", "rb") as f:
+def load_model(model):
+    with open(model, "rb") as f:
         c = pickle.load(f)
 
     return c
@@ -14,7 +15,8 @@ def load_winner():
 
 def run():
 
-    c = load_winner()
+    model = "checkpoint" if check else "winner"
+    c = load_model(model)
 
     print("Loaded genome:")
     print(c)
@@ -45,4 +47,5 @@ def run():
 
 
 if __name__ == '__main__':
+    check = '-check' in sys.argv
     run()

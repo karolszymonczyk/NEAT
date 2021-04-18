@@ -10,6 +10,14 @@ import visualize
 import gym
 
 
+curr_best_fitness = 0
+
+
+def save_model(model, filepath):
+    with open(filepath, 'wb') as f:
+        pickle.dump(model, f)
+
+
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
@@ -36,9 +44,14 @@ def eval_genome(genome, config):
 
         fitnesses.append(fitness)
 
-    net_fitness = np.mean(fitnesses)
+    net_fitness = np.max(fitnesses)
 
-    # The genome's fitness is its mean performance across all runs.
+    global curr_best_fitness
+    if check and net_fitness > curr_best_fitness:
+        save_model(genome, 'checkpoint')
+        curr_best_fitness = net_fitness
+
+    # The genome's fitness is its max performance across all runs.
     return net_fitness
 
 
@@ -69,11 +82,6 @@ def run():
     # print_stats(winner, stats, config)
 
 
-def save_model(winner, filepath):
-    with open(filepath, 'wb') as f:
-        pickle.dump(winner, f)
-
-
 def print_stats(winner, stats, config):
     print(f"Winner: {winner}")
 
@@ -95,7 +103,7 @@ def print_stats(winner, stats, config):
 
 if __name__ == '__main__':
     live = '-live' in sys.argv
-    save = '-save' in sys.argv
+    check = '-check' in sys.argv
     runs_per_net = 2
 
     run()
